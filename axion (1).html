@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Axion Ray // Outbound Intelligence — Dylan Bui</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0e0c;
+  --bg-card: #15171479;
+  --bg-card-solid: #1a1c19;
+  --ink: #ededea;
+  --ink-dim: #8a8b85;
+  --ink-faint: #4a4b46;
+  --line: #2a2b27;
+  --accent: #ffb347;
+  --accent-hot: #ff7849;
+  --green: #b6d77a;
+  --red: #ff6b5b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,179,71,0.08), transparent),
+    linear-gradient(180deg, transparent 0%, transparent 60%, rgba(0,0,0,0.4) 100%);
+  background-attachment: fixed;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+.mono { font-family: 'JetBrains Mono', monospace; }
+.serif { font-family: 'Fraunces', serif; }
+
+/* ============ HEADER ============ */
+header {
+  position: relative;
+  z-index: 2;
+  padding: 32px 40px 24px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.brand-block .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.brand-block h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 800;
+  font-size: clamp(34px, 5vw, 56px);
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  font-variation-settings: "opsz" 144;
+}
+.brand-block h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+}
+.brand-block .sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--ink-dim);
+  margin-top: 12px;
+  letter-spacing: 0.04em;
+}
+.meta {
+  display: flex;
+  gap: 28px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.meta .kv { display: flex; flex-direction: column; gap: 4px; }
+.meta .k { color: var(--ink-faint); }
+.meta .v { color: var(--ink); font-weight: 700; }
+.live-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 1.6s infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ============ CONTROLS BAR ============ */
+.controls {
+  position: relative;
+  z-index: 2;
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: rgba(13,14,12,0.6);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+}
+.search-wrap {
+  flex: 1 1 280px;
+  position: relative;
+}
+.search-wrap input {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  padding: 10px 14px 10px 36px;
+  letter-spacing: 0.02em;
+  transition: border-color 0.15s, background 0.15s;
+}
+.search-wrap input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255,179,71,0.05);
+}
+.search-wrap::before {
+  content: '⌕';
+  position: absolute;
+  left: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-dim);
+  font-size: 16px;
+}
+.stat {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-dim);
+  letter-spacing: 0.08em;
+  margin-left: auto;
+}
+.stat strong { color: var(--accent); font-weight: 700; }
+
+/* ============ FEED ============ */
+.feed-section {
+  position: relative;
+  z-index: 2;
+  padding: 32px 40px 0;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.feed-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.feed-label {
+  font-size: 11px !important;
+  color: var(--accent) !important;
+  margin-bottom: 4px;
+}
+.feed-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.feed-refresh {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.feed-refresh:hover {
+  background: var(--accent);
+  color: #0d0e0c;
+  border-color: var(--accent);
+}
+.feed-refresh.spinning::before {
+  content: '↻';
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.feed-item {
+  background: var(--bg);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+  min-height: 110px;
+}
+.feed-item:hover { background: #131410; }
+.feed-item .src {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.feed-item .src .age { color: var(--ink-faint); }
+.feed-item .headline {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.feed-item .co {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-dim);
+  letter-spacing: 0.04em;
+  margin-top: auto;
+}
+.feed-item .co .dot {
+  display: inline-block;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent-hot);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.feed-loading, .feed-error {
+  grid-column: 1 / -1;
+  padding: 32px;
+  background: var(--bg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--ink-dim);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.feed-error a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.feed-fallback-btn {
+  display: inline-block;
+  padding: 12px 20px;
+  background: var(--accent);
+  color: #0d0e0c !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  margin: 4px 0;
+  transition: background 0.15s;
+  border: 1px solid var(--accent);
+}
+.feed-fallback-btn:hover {
+  background: var(--accent-hot);
+  border-color: var(--accent-hot);
+}
+.feed-fallback-btn.secondary {
+  background: transparent;
+  color: var(--accent) !important;
+  border-color: var(--line);
+}
+.feed-fallback-btn.secondary:hover {
+  background: var(--ink);
+  color: #0d0e0c !important;
+  border-color: var(--ink);
+}
+.feed-fallback-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+.feed-fallback-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-dim);
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+  text-transform: none;
+}
+.feed-fallback-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.btn-count {
+  font-weight: 400;
+  opacity: 0.75;
+}
+.feed-retry-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim) !important;
+  padding: 12px 8px;
+  text-decoration: none !important;
+}
+.feed-retry-link:hover {
+  color: var(--accent) !important;
+}
+
+/* ============ JUMP BAR ============ */
+.jump-section {
+  position: relative;
+  z-index: 2;
+  padding: 32px 40px 0;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.jump-section .section-label {
+  margin-bottom: 10px;
+}
+.jump-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.jump-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: all 0.12s;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.jump-btn:hover {
+  background: var(--accent);
+  color: #0d0e0c;
+  border-color: var(--accent);
+}
+.jump-btn .num {
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+.jump-btn:hover .num {
+  color: #0d0e0c;
+}
+
+/* highlight on scroll-target */
+.card.flash {
+  animation: flash 1.6s ease-out;
+}
+@keyframes flash {
+  0%   { background: rgba(255,179,71,0.25); box-shadow: inset 0 0 0 2px var(--accent); }
+  100% { background: var(--bg); box-shadow: inset 0 0 0 0 transparent; }
+}
+
+/* ============ GRID ============ */
+main {
+  position: relative;
+  z-index: 1;
+  padding: 32px 40px 80px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.card {
+  background: var(--bg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  transition: background 0.2s;
+  min-height: 460px;
+}
+.card:hover { background: #131410; }
+.card.hidden { display: none; }
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.rank {
+  font-family: 'Fraunces', serif;
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink-faint);
+  font-variation-settings: "opsz" 144;
+  font-feature-settings: "tnum";
+}
+.rank.top { color: var(--accent); }
+.icp-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 8px;
+  border: 1px solid var(--green);
+  color: var(--green);
+  text-transform: uppercase;
+}
+.icp-pill.score-14 { border-color: #ffd66b; color: #ffd66b; }
+.icp-pill.score-13 { border-color: #ffb347; color: #ffb347; }
+.icp-pill.score-12 { border-color: #ff9466; color: #ff9466; }
+
+.company-name {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  font-variation-settings: "opsz" 72;
+}
+.company-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.company-meta .industry { color: var(--accent); }
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 4px;
+}
+.pain {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.angle {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+  font-style: italic;
+  border-left: 2px solid var(--accent);
+  padding-left: 12px;
+}
+.subject {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--ink);
+  padding: 10px 12px;
+  background: rgba(255,179,71,0.06);
+  border: 1px dashed rgba(255,179,71,0.3);
+  cursor: pointer;
+  transition: background 0.15s;
+  word-break: break-word;
+}
+.subject:hover { background: rgba(255,179,71,0.12); }
+.subject::before {
+  content: 'RE: ';
+  color: var(--accent);
+}
+
+/* ============ ACTIONS ============ */
+.actions {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.actions-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.actions-label .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.actions-label .live {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+.action:hover {
+  background: var(--accent);
+  color: #0d0e0c;
+  border-color: var(--accent);
+}
+.action .ico { color: var(--accent); transition: color 0.15s; font-weight: 700; }
+.action:hover .ico { color: #0d0e0c; }
+.action.primary {
+  background: var(--ink);
+  color: #0d0e0c;
+  border-color: var(--ink);
+}
+.action.primary .ico { color: var(--accent-hot); }
+.action.primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* trigger buttons row */
+.triggers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+}
+.trigger-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+  background: rgba(255,120,73,0.08);
+  border: 1px solid rgba(255,120,73,0.25);
+  color: var(--accent-hot);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.trigger-btn:hover {
+  background: var(--accent-hot);
+  color: #0d0e0c;
+}
+
+/* toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink);
+  color: var(--bg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 10px 18px;
+  opacity: 0;
+  transition: all 0.25s;
+  z-index: 99;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+footer {
+  position: relative;
+  z-index: 2;
+  padding: 24px 40px;
+  border-top: 1px solid var(--line);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+@media (max-width: 700px) {
+  header, .controls, main, footer { padding-left: 20px; padding-right: 20px; }
+  .grid { grid-template-columns: 1fr; }
+  .meta { font-size: 10px; gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-block">
+    <div class="tag">// Axion Ray Outbound Intelligence</div>
+    <h1>Target <em>25</em>.</h1>
+    <div class="sub">Quality intelligence for industrial manufacturers — live prospect command center.</div>
+  </div>
+  <div class="meta">
+    <div class="kv"><span class="k">Operator</span><span class="v">Dylan Bui</span></div>
+    <div class="kv"><span class="k">Role</span><span class="v">BDR / Axion Ray</span></div>
+    <div class="kv"><span class="k">Status</span><span class="v"><span class="live-dot"></span>Live</span></div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <input id="search" placeholder="Search accounts, industries, pain hooks..." />
+  </div>
+  <div class="stat"><strong id="shown">25</strong>/25 ACCOUNTS</div>
+</div>
+
+<section class="feed-section">
+  <div class="feed-head">
+    <div>
+      <div class="section-label feed-label">// Live Headlines · Top 25 Accounts</div>
+      <div class="feed-sub">Recalls · regulatory · warranty · field failures · quality signals — updated <span id="feed-ts">just now</span></div>
+    </div>
+    <button id="feed-refresh" class="feed-refresh">↻ Refresh</button>
+  </div>
+  <div id="feed" class="feed">
+    <div class="feed-loading">Loading headlines across all 25 accounts…</div>
+  </div>
+</section>
+
+<section class="jump-section">
+  <div class="section-label">// Jump to Account</div>
+  <div class="jump-bar" id="jump-bar"></div>
+</section>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<footer>
+  <div>// Axion Ray // VP Quality · VP Mfg Ops · VP Engineering · VP Customer Experience</div>
+  <div>Data refreshed: <span id="ts"></span> · All news links open live searches</div>
+</footer>
+
+<script>
+const ACCOUNTS = [{"rank": 1, "name": "TE Connectivity", "country": "Switzerland", "revenue": "~$15B", "industry": "Connectors / Electronics", "icp": 15, "pain": "Scaling AI-powered quality inspection from 3 production lines to 100+ global sites; downward pricing pressure requires defect cost reduction.", "angle": "Axion Ray helps TE unify quality signal across 100+ manufacturing sites so yield issues surface before they become field escapes or warranty claims — not after.", "subject": "How Axion helps manufacturers cut field escapes at global scale", "triggers": ["recall", "warranty", "field failure", "production halt", "defect"], "bucket": "Electronics"}, {"rank": 2, "name": "Lam Research", "country": "United States", "revenue": "~$20.6B", "industry": "Semiconductor Equipment", "icp": 15, "pain": "27% revenue surge driven by AI/memory demand; new SiC process transitions create quality complexity across etch & deposition equipment production.", "angle": "As memory CapEx explodes, Lam's build rate is accelerating — Axion Ray helps semiconductor equipment manufacturers catch process deviations before they delay customer shipments.", "subject": "Protecting yield as you scale into the memory equipment boom", "triggers": ["yield issue", "wafer defect", "process deviation", "production halt", "scrap"], "bucket": "Semiconductors"}, {"rank": 3, "name": "Illinois Tool Works", "country": "United States", "revenue": "~$15B", "industry": "Diversified Manufacturing", "icp": 15, "pain": "84 decentralized business units = fragmented quality data; AI welding system already launched but no cross-unit quality visibility.", "angle": "With 84 business units operating independently, ITW has quality data everywhere and visibility nowhere. Axion Ray creates the connective tissue for enterprise quality intelligence without disrupting decentralized operations.", "subject": "Unifying quality intelligence across 84 business units", "triggers": ["recall", "warranty", "field failure", "production halt", "defect"], "bucket": "Industrial"}, {"rank": 4, "name": "Flex", "country": "United States", "revenue": "~$26B", "industry": "Electronics Mfg. Services", "icp": 15, "pain": "Customers demand mission-critical reliability; PCBA errors flow downstream into test/debug; AI defect pilots running but scaling is complex.", "angle": "Flex's customers don't tolerate quality escapes — Axion Ray helps EMS providers close the loop between defect detection and root cause resolution across multi-customer production environments.", "subject": "Closing the loop on defect detection at Flex scale", "triggers": ["recall", "warranty", "field failure", "production halt", "defect"], "bucket": "Electronics"}, {"rank": 5, "name": "Magna Steyr / Magna Int'l", "country": "Austria / Canada", "revenue": "~$40B", "industry": "Automotive Tier 1", "icp": 15, "pain": "Software quality assurance cited as an industry-wide gap driving recalls; tariff disruption reshaping supply chain; margin pressure requires quality cost reduction.", "angle": "Rising software-related automotive recalls are costing Tier 1 suppliers millions. Axion Ray gives Magna a single platform to connect supplier quality, field data, and warranty — turning reactive warranty spend into proactive defect resolution.", "subject": "Reducing warranty spend as software recalls rise", "triggers": ["NHTSA recall", "IATF 16949", "warranty", "supplier quality", "stop ship"], "bucket": "Automotive"}, {"rank": 6, "name": "ZEISS", "country": "Germany", "revenue": "~€11B", "industry": "Precision Optics / Metrology", "icp": 14, "pain": "ZEISS sells quality measurement tools but manages internal quality across 4 complex divisions (semiconductor, medical, industrial, consumer). ZEISS report states quality is a 'critical enabler of strategic growth.'", "angle": "ZEISS measures quality for the world — Axion Ray helps ZEISS manage quality for themselves, turning metrology data from their own instruments into actionable quality intelligence across divisions.", "subject": "How the world's quality leader manages its own quality", "triggers": ["recall", "warranty", "field failure", "production halt", "defect"], "bucket": "Industrial"}, {"rank": 7, "name": "Textron", "country": "United States", "revenue": "~$12B", "industry": "Aerospace & Defense", "icp": 14, "pain": "Announced April 2026: separating Industrial segment to become a pure-play aerospace & defense company — major transformation creates quality system alignment risk.", "angle": "A business separation of this scale means quality data, processes, and systems need to be cleanly divided and re-baselined. Axion Ray helps Textron stand up a right-sized quality platform for the new aerospace entity from day one.", "subject": "Standing up quality infrastructure for your aerospace separation", "triggers": ["AS9100", "FAA", "recall", "non-conformance", "supplier quality"], "bucket": "Aerospace & Defense"}, {"rank": 8, "name": "Onsemi", "country": "United States", "revenue": "~$7B", "industry": "Semiconductors (SiC)", "icp": 14, "pain": "Transitioning to 200mm SiC wafers in early 2026 — yield issues during scale-up could erode the cost advantage onsemi is counting on.", "angle": "200mm SiC scale-up is technically demanding. Axion Ray gives onsemi real-time yield signal tied to process parameters so quality issues are caught before they erode the margin advantage of the new platform.", "subject": "Protecting yield during your 200mm SiC scale-up", "triggers": ["yield issue", "wafer defect", "process deviation", "production halt", "scrap"], "bucket": "Semiconductors"}, {"rank": 9, "name": "MAHLE", "country": "Germany", "revenue": "~€12B", "industry": "Automotive Tier 1", "icp": 14, "pain": "MAHLE 2030+ restructuring condensed 5 divisions to 3 as of Jan 2025; added Celonis for supply chain; quality visibility across new org structure is a gap.", "angle": "MAHLE is rebuilding its operating model — now is the moment to lock in a modern quality platform that maps to the new 3-division structure before technical debt accumulates.", "subject": "Quality infrastructure for the MAHLE 2030+ structure", "triggers": ["NHTSA recall", "IATF 16949", "warranty", "supplier quality", "stop ship"], "bucket": "Automotive"}, {"rank": 10, "name": "Renesas Electronics", "country": "Japan", "revenue": "~$9B", "industry": "Automotive Semiconductors", "icp": 14, "pain": "Leadership changes Nov 2025; launching Gen 5 3nm automotive SoC for SDV; ASIL D / IATF 16949 compliance at new process node raises quality stakes.", "angle": "New leadership + new 3nm process node + ASIL D compliance requirements = a quality management stress test. Axion Ray helps Renesas maintain zero-defect automotive quality standards through the most demanding product transitions.", "subject": "Zero-defect automotive quality at your 3nm process node", "triggers": ["NHTSA recall", "IATF 16949", "warranty", "supplier quality", "stop ship"], "bucket": "Automotive"}, {"rank": 11, "name": "Kawasaki Heavy Industries", "country": "Japan", "revenue": "~$12B", "industry": "Aerospace / Industrial", "icp": 14, "pain": "2025 investigation found submarine engine test data tampering; internal review documented that complex quality tasks were managed manually via paper — connecting design to field was cited as a core gap.", "angle": "When a data integrity incident surfaces in defense manufacturing, the root cause is almost always the same: manual, disconnected quality records. Axion Ray replaces paper-based QMS workflows with a unified, auditable quality data platform.", "subject": "Replacing paper-based quality records before the next audit", "triggers": ["AS9100", "FAA", "recall", "non-conformance", "supplier quality"], "bucket": "Aerospace & Defense"}, {"rank": 12, "name": "Hoya", "country": "Japan", "revenue": "~$7B", "industry": "Optics / Medical / Semiconductor", "icp": 14, "pain": "Precision manufacturing across three highly regulated industries (optical, medical devices ISO 13485, semiconductor masks) — multi-standard quality complexity.", "angle": "Managing quality across optical, medical, and semiconductor divisions means operating under three different regulatory frameworks simultaneously. Axion Ray creates a single quality intelligence layer that adapts to each division's standards.", "subject": "One quality platform for three regulated manufacturing divisions", "triggers": ["FDA warning", "483", "recall", "CAPA", "design control"], "bucket": "Medical Devices"}, {"rank": 13, "name": "Vestas", "country": "Denmark", "revenue": "~€17B", "industry": "Wind Energy / Manufacturing", "icp": 13, "pain": "Added €210M in warranty provisions in one quarter; lost production factor rising toward 4% due to 'extraordinary' repairs on newer, larger turbine models.", "angle": "€210M in warranty provisions in a single quarter is a field quality problem. Axion Ray helps Vestas connect early field signals to design and manufacturing data so warranty cost trends are caught before they compound.", "subject": "Turning €210M in warranty provisions into a solvable problem", "triggers": ["blade failure", "warranty", "field failure", "lost production", "defect"], "bucket": "Industrial"}, {"rank": 14, "name": "Teradyne", "country": "United States", "revenue": "~$3B", "industry": "Semiconductor Test Equipment", "icp": 13, "pain": "Growing robotics and industrial automation segment adds manufacturing complexity; as a quality testing company, internal production quality directly reflects brand credibility.", "angle": "Teradyne's customers buy test equipment because quality matters to them — Axion Ray ensures Teradyne holds its own manufacturing to the same standard, especially as the robotics product line scales.", "subject": "Holding your own manufacturing to the standard you sell", "triggers": ["yield issue", "wafer defect", "process deviation", "production halt", "scrap"], "bucket": "Semiconductors"}, {"rank": 15, "name": "Skyworks Solutions", "country": "United States", "revenue": "~$4.5B", "industry": "RF Semiconductors", "icp": 13, "pain": "Manufacturing yield fluctuations in complex, specialized semiconductor processes cited as a key risk; EPS declining; 5G/WiFi7/AI product transitions underway.", "angle": "Skyworks is navigating both revenue headwinds and product transitions simultaneously — the worst time for a yield surprise. Axion Ray gives Skyworks real-time visibility into process-quality correlations so yield stays predictable through technology transitions.", "subject": "Keeping yield predictable through your 5G and WiFi7 transitions", "triggers": ["yield issue", "wafer defect", "process deviation", "production halt", "scrap"], "bucket": "Semiconductors"}, {"rank": 16, "name": "Dexcom", "country": "United States", "revenue": "~$4B", "industry": "Medical Devices (CGM)", "icp": 13, "pain": "FDA Warning Letter issued March 4, 2025: inadequate design change tracking and risk analysis; sensor coating change reduced accuracy — core quality management non-conformity.", "angle": "Dexcom's FDA Warning Letter was triggered by a gap in design change management — exactly what Axion Ray was built to solve. We help medical device manufacturers track, analyze, and validate changes in real-time to stay ahead of regulatory findings.", "subject": "Closing the design change tracking gap that triggered your FDA warning", "triggers": ["FDA warning", "483", "recall", "CAPA", "design control"], "bucket": "Medical Devices"}, {"rank": 17, "name": "Karl Storz", "country": "Germany", "revenue": "~€2.5B", "industry": "Medical Devices (Endoscopy)", "icp": 13, "pain": "NMPA suspended import of Karl Storz High-Frequency Surgery System in March 2026 due to QMS deficiencies: software version control, adverse event handling, and management rep performance.", "angle": "Two consecutive regulatory findings in 12 months signal a systemic quality management gap, not a one-time issue. Axion Ray helps Karl Storz build the structured QMS infrastructure that regulators expect to see.", "subject": "From reactive compliance to proactive quality management", "triggers": ["FDA warning", "483", "recall", "CAPA", "design control"], "bucket": "Medical Devices"}, {"rank": 18, "name": "Arthrex", "country": "United States", "revenue": "~$2B", "industry": "Medical Devices (Surgical)", "icp": 13, "pain": "Private, fast-growing surgical device company operating under FDA QMS requirements; scaling manufacturing infrastructure to support aggressive product launch cadence.", "angle": "Arthrex's growth engine depends on rapid, compliant product launches. Axion Ray helps fast-scaling medical device manufacturers maintain FDA-grade quality management without the overhead of legacy QMS software.", "subject": "Quality infrastructure that scales with your product launch pace", "triggers": ["FDA warning", "483", "recall", "CAPA", "design control"], "bucket": "Medical Devices"}, {"rank": 19, "name": "Advantest", "country": "Japan", "revenue": "~$4B", "industry": "Semiconductor Test Equipment", "icp": 13, "pain": "Semiconductor test equipment manufacturer growing with AI chip demand; expanding global manufacturing footprint to serve TSMC, Samsung, SK Hynix.", "angle": "As AI chip volumes surge, Advantest is scaling production globally. Axion Ray helps semiconductor equipment manufacturers maintain quality consistency across newly ramped facilities before customers notice a change.", "subject": "Maintaining quality consistency as you scale for AI chip demand", "triggers": ["yield issue", "wafer defect", "process deviation", "production halt", "scrap"], "bucket": "Semiconductors"}, {"rank": 20, "name": "Sandvik Group", "country": "Sweden", "revenue": "~$11B", "industry": "Industrial Tooling / Mining", "icp": 12, "pain": "23 fully autonomous divisions — like ITW, decentralized model creates cross-division quality blind spots; mining and machining both have high-consequence quality failures.", "angle": "Sandvik's 23 divisions operate with full autonomy — which is a competitive strength until a quality trend in one division becomes a cross-cutting problem. Axion Ray provides the quality intelligence layer that works with Sandvik's decentralized model.", "subject": "Cross-division quality intelligence for a decentralized enterprise", "triggers": ["recall", "warranty", "field failure", "production halt", "defect"], "bucket": "Industrial"}, {"rank": 21, "name": "NSK", "country": "United States / Japan", "revenue": "~$7B", "industry": "Precision Bearings / Auto", "icp": 12, "pain": "Precision bearings are safety-critical in automotive and industrial applications; IATF 16949 compliance; warranty costs from bearing failures are severe.", "angle": "A single bearing failure can cascade into a full vehicle recall. Axion Ray helps precision component suppliers like NSK connect supplier quality, process data, and field returns to prevent warranty exposure before it reaches OEM level.", "subject": "Preventing bearing failures from becoming OEM warranty events", "triggers": ["NHTSA recall", "IATF 16949", "warranty", "supplier quality", "stop ship"], "bucket": "Industrial"}, {"rank": 22, "name": "Freudenberg", "country": "Germany", "revenue": "~€12B", "industry": "Seals / Filtration / Medical", "icp": 12, "pain": "Highly diversified family-owned manufacturer across seals, filtration, medical, and performance materials — multiple regulatory frameworks, complex supplier base.", "angle": "Freudenberg's diversity is its strength — and its quality management challenge. Axion Ray gives Freudenberg a unified quality platform that spans regulated medical and industrial product lines without requiring a single QMS.", "subject": "One quality platform for a diversified, regulated manufacturer", "triggers": ["FDA warning", "483", "recall", "CAPA", "design control"], "bucket": "Medical Devices"}, {"rank": 23, "name": "Dover Corporation", "country": "United States", "revenue": "~$8B", "industry": "Diversified Industrial", "icp": 12, "pain": "Active M&A strategy across 5 segments; each acquisition introduces new quality systems, supplier bases, and manufacturing processes that need integration.", "angle": "Every Dover acquisition brings a quality system that doesn't speak to the others. Axion Ray accelerates quality integration post-acquisition so newly acquired businesses meet Dover's standards faster.", "subject": "Accelerating quality integration across Dover acquisitions", "triggers": ["recall", "warranty", "field failure", "production halt", "defect"], "bucket": "Industrial"}, {"rank": 24, "name": "Delta Electronics", "country": "Taiwan", "revenue": "~$10B", "industry": "Power Electronics / EV", "icp": 12, "pain": "Rapid growth in EV and industrial automation segments driving aggressive NPI cycles; global manufacturing scale.", "angle": "Delta's EV and automation growth means launching more products, faster, with less margin for quality surprises. Axion Ray helps power electronics manufacturers manage quality risk across high-velocity NPI cycles.", "subject": "Managing quality risk across your EV and automation NPI cycle", "triggers": ["recall", "warranty", "field failure", "production halt", "defect"], "bucket": "Electronics"}, {"rank": 25, "name": "Sartorius", "country": "Germany", "revenue": "~€3.4B", "industry": "Bioprocess / Lab Equipment", "icp": 12, "pain": "FDA-regulated bioprocess equipment; 21 CFR Part 11 compliance; rapid growth in biomanufacturing creates scaling quality challenges.", "angle": "Biomanufacturing customers expect Sartorius equipment to be flawless — any quality escape impacts a patient's therapy. Axion Ray helps life science equipment manufacturers build the quality infrastructure that biopharmaceutical auditors expect.", "subject": "Quality infrastructure that bioprocess customers can stake their audits on", "triggers": ["FDA warning", "483", "recall", "CAPA", "design control"], "bucket": "Industrial"}];
+
+const grid = document.getElementById('grid');
+const searchInput = document.getElementById('search');
+const shownEl = document.getElementById('shown');
+const toast = document.getElementById('toast');
+const jumpBar = document.getElementById('jump-bar');
+const feedEl = document.getElementById('feed');
+const feedTs = document.getElementById('feed-ts');
+const feedRefresh = document.getElementById('feed-refresh');
+
+document.getElementById('ts').textContent = new Date().toLocaleString('en-US', {
+  month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute:'2-digit'
+});
+
+function gNews(query) {
+  return 'https://news.google.com/search?q=' + encodeURIComponent(query) + '&hl=en-US&gl=US&ceid=US:en';
+}
+function gNewsRecent(query) {
+  return 'https://news.google.com/search?q=' + encodeURIComponent(query + ' when:30d') + '&hl=en-US&gl=US&ceid=US:en';
+}
+function liSearch(query) {
+  return 'https://www.linkedin.com/search/results/people/?keywords=' + encodeURIComponent(query);
+}
+function liCompany(name) {
+  return 'https://www.linkedin.com/search/results/companies/?keywords=' + encodeURIComponent(name);
+}
+
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+}
+
+function copy(text, label) {
+  navigator.clipboard.writeText(text).then(() => showToast(label + ' copied'));
+}
+
+function slug(s) {
+  return 'card-' + s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function render() {
+  grid.innerHTML = '';
+  const q = searchInput.value.trim().toLowerCase();
+  let shown = 0;
+
+  ACCOUNTS.forEach(a => {
+    let visible = true;
+    if (q) {
+      const hay = (a.name + ' ' + a.industry + ' ' + a.pain + ' ' + a.country + ' ' + a.angle).toLowerCase();
+      if (!hay.includes(q)) visible = false;
+    }
+    if (!visible) return;
+    shown++;
+
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.id = slug(a.name);
+
+    const triggerBtns = a.triggers.map(t =>
+      `<a class="trigger-btn" target="_blank" rel="noopener" href="${gNewsRecent(a.name + ' ' + t)}">${t}</a>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="rank ${a.icp === 15 ? 'top' : ''}">${String(a.rank).padStart(2,'0')}</div>
+        <div class="icp-pill score-${a.icp}">ICP ${a.icp}/15</div>
+      </div>
+
+      <div>
+        <div class="company-name">${a.name}</div>
+        <div class="company-meta">
+          <span class="industry">${a.industry}</span>
+          <span>${a.country}</span>
+          <span>${a.revenue}</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Pain Hook</div>
+        <div class="pain">${a.pain}</div>
+      </div>
+
+      <div>
+        <div class="section-label">Messaging Angle</div>
+        <div class="angle">${a.angle}</div>
+      </div>
+
+      <div>
+        <div class="section-label">Suggested Subject — click to copy</div>
+        <div class="subject" data-copy="${a.subject.replace(/"/g,'&quot;')}">${a.subject}</div>
+      </div>
+
+      <div class="actions">
+        <div class="actions-label">
+          <span class="lbl">// Live Research</span>
+          <span class="live">● Updates on click</span>
+        </div>
+        <div class="action-grid">
+          <a class="action primary" target="_blank" rel="noopener" href="${gNewsRecent(buildAxionQuery(a))}">
+            <span class="ico">▸</span> News · 30d
+          </a>
+          <a class="action" target="_blank" rel="noopener" href="${gNews(a.name)}">
+            <span class="ico">▸</span> All News
+          </a>
+          <a class="action" target="_blank" rel="noopener" href="${liSearch('VP Quality ' + a.name)}">
+            <span class="ico">in</span> VP Quality
+          </a>
+          <a class="action" target="_blank" rel="noopener" href="${liSearch('VP Manufacturing ' + a.name)}">
+            <span class="ico">in</span> VP Mfg Ops
+          </a>
+          <a class="action" target="_blank" rel="noopener" href="${liCompany(a.name)}">
+            <span class="ico">in</span> Company
+          </a>
+          <a class="action" target="_blank" rel="noopener" href="https://www.google.com/search?q=${encodeURIComponent(a.name + ' investor relations annual report')}">
+            <span class="ico">▸</span> IR / 10-K
+          </a>
+        </div>
+        <div class="triggers">${triggerBtns}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  shownEl.textContent = shown;
+}
+
+searchInput.addEventListener('input', render);
+
+grid.addEventListener('click', (e) => {
+  const s = e.target.closest('.subject');
+  if (s) copy(s.dataset.copy, 'Subject line');
+});
+
+// ============ JUMP BAR ============
+function renderJumpBar() {
+  jumpBar.innerHTML = '';
+  // sort alphabetically for quick scanning
+  const sorted = [...ACCOUNTS].sort((a,b) => a.name.localeCompare(b.name));
+  sorted.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'jump-btn';
+    btn.innerHTML = `<span class="num">${String(a.rank).padStart(2,'0')}</span> ${a.name}`;
+    btn.addEventListener('click', () => jumpTo(a.name));
+    jumpBar.appendChild(btn);
+  });
+}
+
+function jumpTo(name) {
+  // clear filter so target is visible
+  if (searchInput.value.trim()) {
+    searchInput.value = '';
+    render();
+  }
+  const card = document.getElementById(slug(name));
+  if (!card) return;
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  card.classList.remove('flash');
+  void card.offsetWidth; // restart animation
+  card.classList.add('flash');
+}
+
+// ============ LIVE FEED (Google News RSS via CORS proxy chain) ============
+const PROXIES = [
+  url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+  url => 'https://api.codetabs.com/v1/proxy/?quest=' + encodeURIComponent(url),
+  url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+];
+let workingProxy = null; // remember which one succeeds
+
+function rssUrl(query) {
+  return 'https://news.google.com/rss/search?q=' + encodeURIComponent(query) + '&hl=en-US&gl=US&ceid=US:en';
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  const diff = (Date.now() - d.getTime()) / 1000;
+  if (diff < 3600) return Math.max(1, Math.floor(diff/60)) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+  return d.toLocaleDateString();
+}
+
+function stripCdata(s) {
+  if (!s) return '';
+  return s.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1').trim();
+}
+
+function decodeHtmlEntities(s) {
+  const t = document.createElement('textarea');
+  t.innerHTML = s;
+  return t.value;
+}
+
+async function tryFetch(url) {
+  // Try proxies in order; remember the first that works
+  const order = workingProxy !== null
+    ? [workingProxy, ...PROXIES.map((_,i)=>i).filter(i=>i!==workingProxy)]
+    : PROXIES.map((_,i)=>i);
+
+  for (const i of order) {
+    try {
+      const r = await fetch(PROXIES[i](url), { signal: AbortSignal.timeout(8000) });
+      if (!r.ok) continue;
+      const text = await r.text();
+      if (!text || text.length < 50) continue;
+      workingProxy = i;
+      return text;
+    } catch (e) {
+      continue;
+    }
+  }
+  return null;
+}
+
+function buildAxionQuery(account) {
+  // Core quality/regulatory keywords that signal Axion-fit pain
+  // Industry-tailored: medical devices weight FDA/483, semis weight yield/defect, etc.
+  const ind = (account.industry || '').toLowerCase();
+  let keywords;
+  if (ind.includes('medical') || ind.includes('bioprocess') || ind.includes('seals / filtration / medical')) {
+    keywords = '("FDA warning letter" OR "483" OR recall OR "warning letter" OR CAPA OR "quality system" OR "design control" OR "adverse event")';
+  } else if (ind.includes('aerospace') || ind.includes('defense')) {
+    keywords = '(recall OR "non-conformance" OR "AS9100" OR FAA OR "quality escape" OR "supplier quality" OR investigation OR "production halt")';
+  } else if (ind.includes('automotive') || ind.includes('bearing')) {
+    keywords = '(recall OR "NHTSA" OR warranty OR "IATF 16949" OR "supplier quality" OR "field failure" OR "stop ship" OR "production halt")';
+  } else if (ind.includes('semiconductor') || ind.includes('rf') || ind.includes('wafer')) {
+    keywords = '(yield OR "wafer defect" OR "process deviation" OR "quality escape" OR "production issue" OR "field failure" OR scrap)';
+  } else if (ind.includes('wind') || ind.includes('energy')) {
+    keywords = '(warranty OR "blade failure" OR "field failure" OR defect OR "lost production" OR "service issue" OR recall)';
+  } else {
+    // Diversified industrial, electronics, EMS, optics, tooling
+    keywords = '(recall OR warranty OR "quality issue" OR "field failure" OR "production halt" OR defect OR "supplier quality" OR "non-conformance")';
+  }
+  return `"${account.name}" ${keywords}`;
+}
+
+async function fetchFeedForAccount(account) {
+  const text = await tryFetch(rssUrl(buildAxionQuery(account)));
+  if (!text) return [];
+  try {
+    const doc = new DOMParser().parseFromString(text, 'text/xml');
+    const items = [...doc.querySelectorAll('item')].slice(0, 3);
+    return items.map(it => ({
+      account: account.name,
+      rank: account.rank,
+      title: decodeHtmlEntities(stripCdata(it.querySelector('title')?.textContent || '')),
+      link: it.querySelector('link')?.textContent?.trim() || '',
+      pubDate: it.querySelector('pubDate')?.textContent?.trim() || '',
+      source: it.querySelector('source')?.textContent?.trim() || ''
+    })).filter(it => it.title && it.link);
+  } catch (e) {
+    return [];
+  }
+}
+
+function buildGroupQuery(group) {
+  const names = group.map(a => '"' + a.name + '"').join(' OR ');
+  // Axion-tuned: regulatory + operational quality signals, no earnings
+  return '(' + names + ') (recall OR "warning letter" OR warranty OR "quality issue" OR "field failure" OR FDA OR "production halt" OR defect)';
+}
+
+function groupByIcp() {
+  const tiers = { 15: [], 14: [], 13: [], 12: [] };
+  ACCOUNTS.forEach(a => { if (tiers[a.icp]) tiers[a.icp].push(a); });
+  return tiers;
+}
+
+function openTier(score) {
+  const tiers = groupByIcp();
+  const group = tiers[score];
+  if (!group || !group.length) return;
+  const url = 'https://news.google.com/search?q=' + encodeURIComponent(buildGroupQuery(group)) + '&hl=en-US&gl=US&ceid=US:en';
+  window.open(url, '_blank');
+}
+
+function openAllIndividual() {
+  // Browsers block sequential window.opens — only the first will succeed
+  // unless the user has explicitly allowed popups for this site.
+  ACCOUNTS.forEach(a => {
+    const url = 'https://news.google.com/search?q=' + encodeURIComponent(buildAxionQuery(a)) + '&hl=en-US&gl=US&ceid=US:en';
+    window.open(url, '_blank');
+  });
+}
+
+window.openTier = openTier;
+window.openAllIndividual = openAllIndividual;
+
+function renderFeedItems(items) {
+  if (!items.length) {
+    const tiers = groupByIcp();
+    const tierButtons = [15, 14, 13, 12].map(score => {
+      const count = tiers[score].length;
+      if (!count) return '';
+      return `<a href="#" onclick="openTier(${score});return false;" class="feed-fallback-btn">
+        → ICP ${score} <span class="btn-count">(${count} accounts)</span>
+      </a>`;
+    }).join('');
+
+    feedEl.innerHTML = `<div class="feed-error">
+      All three news proxies failed (corsproxy.io · codetabs · allorigins).
+      <br><br>
+      <div class="feed-fallback-hint">Click each tier to open it in Google News — browsers only allow one tab per click.</div>
+      <div class="feed-fallback-row">
+        ${tierButtons}
+      </div>
+      <div class="feed-fallback-secondary">
+        <a href="#" onclick="if(confirm('To open 25 tabs, your browser must allow popups for this site. Continue?')){openAllIndividual();}return false;" class="feed-fallback-btn secondary">
+          → Open all 25 (requires popups enabled)
+        </a>
+        <a href="#" onclick="loadFeed();return false;" class="feed-retry-link">↻ Retry proxies</a>
+      </div>
+    </div>`;
+    return;
+  }
+  items.sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
+  const top = items.slice(0, 12);
+  feedEl.innerHTML = top.map(it => `
+    <a class="feed-item" target="_blank" rel="noopener" href="${it.link}">
+      <div class="src">
+        <span>${it.source || 'News'}</span>
+        <span class="age">${timeAgo(it.pubDate)}</span>
+      </div>
+      <div class="headline">${it.title}</div>
+      <div class="co"><span class="dot"></span>${it.account} · #${String(it.rank).padStart(2,'0')}</div>
+    </a>
+  `).join('');
+}
+
+async function loadFeed() {
+  feedRefresh.classList.add('spinning');
+  workingProxy = null;
+  feedEl.innerHTML = '<div class="feed-loading">Pulling headlines across 25 accounts… (10–25s)</div>';
+
+  // Lower concurrency (3 at a time) to avoid proxy rate limits
+  const batchSize = 3;
+  const all = [];
+  let proxyFound = false;
+  for (let i = 0; i < ACCOUNTS.length; i += batchSize) {
+    const batch = ACCOUNTS.slice(i, i + batchSize);
+    const results = await Promise.all(batch.map(fetchFeedForAccount));
+    results.forEach(arr => all.push(...arr));
+    if (workingProxy !== null) proxyFound = true;
+    // Update progress
+    feedEl.innerHTML = `<div class="feed-loading">Pulled ${Math.min(i+batchSize, ACCOUNTS.length)}/${ACCOUNTS.length} accounts… ${all.length} headlines found</div>`;
+  }
+
+  if (!proxyFound) {
+    renderFeedItems([]);
+    feedRefresh.classList.remove('spinning');
+    return;
+  }
+
+  const cutoff = Date.now() - 14 * 86400 * 1000;
+  const recent = all.filter(it => {
+    const t = new Date(it.pubDate).getTime();
+    return !isNaN(t) && t > cutoff;
+  });
+  renderFeedItems(recent.length ? recent : all);
+  feedTs.textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  feedRefresh.classList.remove('spinning');
+}
+
+feedRefresh.addEventListener('click', loadFeed);
+window.loadFeed = loadFeed; // expose for retry link
+
+// ============ INIT ============
+render();
+renderJumpBar();
+loadFeed();
+</script>
+</body>
+</html>
