@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dylan's Hub</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Barlow+Condensed:wght@400;500;600&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #050810;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    .hub {
+      background: #080c14;
+      border: 0.5px solid #1a2238;
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      width: 90%;
+      max-width: 700px;
+    }
+
+    .hub-header { text-align: center; margin-bottom: 2.5rem; }
+
+    .hub-title {
+      font-family: 'Righteous', cursive;
+      font-size: 52px;
+      color: #dce6f5;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: #2a4a8a;
+      margin: 0.75rem auto;
+    }
+
+    .hub-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      color: #3a5070;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: #0c1220;
+      border: 0.5px solid #1e2e4a;
+      border-radius: 10px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .card:hover { border-color: #3d6abf; background: #101a2e; }
+
+    .card i { font-size: 28px; color: #3d6abf; }
+
+    .card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #b8cce4;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: #3a5070;
+      letter-spacing: 0.06em;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      color: #1e3050;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="hub">
+    <div class="hub-header">
+      <div class="hub-title">Dylan's Hub</div>
+      <div class="divider"></div>
+      <div class="hub-sub">Select a destination</div>
+    </div>
+
+    <div class="grid">
+
+      <a class="card" href="ff.html">
+        <i class="ti ti-trophy"></i>
+        <div>
+          <div class="card-name">Fantasy Football</div>
+          <div class="card
