@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fantasy Rankings</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161920;
+    --surface2: #1e2230;
+    --border: #2a2f3d;
+    --accent: #f0b429;
+    --accent2: #e05252;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --qb: #f87171;
+    --rb: #60a5fa;
+    --wr: #34d399;
+    --te: #a78bfa;
+    --k:  #fbbf24;
+    --dst: #fb923c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .logo span { color: var(--text); }
+
+  .stats-bar {
+    display: flex;
+    gap: 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .stats-bar strong { color: var(--accent); font-size: 1rem; display: block; }
+
+  /* CONTROLS */
+  .controls {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .filter-label {
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-right: 4px;
+  }
+
+  .pos-btn {
+    padding: 6px 16px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+
+  .pos-btn:hover { border-color: var(--text); color: var(--text); }
+  .pos-btn.active { background: var(--accent); border-color: var(--accent); color: #0d0f14; font-weight: 600; }
+
+  .pos-btn[data-pos="QB"].active  { background: var(--qb); border-color: var(--qb); }
+  .pos-btn[data-pos="RB"].active  { background: var(--rb); border-color: var(--rb); }
+  .pos-btn[data-pos="WR"].active  { background: var(--wr); border-color: var(--wr); }
+  .pos-btn[data-pos="TE"].active  { background: var(--te); border-color: var(--te); }
+  .pos-btn[data-pos="K"].active   { background: var(--k);  border-color: var(--k);  }
+  .pos-btn[data-pos="DST"].active { background: var(--dst);border-color: var(--dst);}
+
+  .search-wrap {
+    margin-left: auto;
+    position: relative;
+  }
+
+  .search-wrap input {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    padding: 6px 12px 6px 32px;
+    width: 200px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--muted); }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+  }
+
+  .reset-btn {
+    padding: 6px 14px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* HINT */
+  .hint {
+    padding: 8px 32px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    padding: 0 32px 64px;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    min-width: 600px;
+  }
+
+  thead th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  thead th.sortable { cursor: pointer; }
+  thead th.sortable:hover { color: var(--text); }
+  thead th.sorted { color: var(--accent); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr.moving { background: rgba(240,180,41,0.08); outline: 1.5px solid var(--accent); }
+
+  td {
+    padding: 11px 12px;
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+
+  .td-rank {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    width: 48px;
+    text-align: right;
+    padding-right: 20px;
+  }
+
+  .td-rank .my-rank {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .td-name { font-weight: 600; font-size: 0.92rem; }
+  .td-name.crossed { text-decoration: line-through; opacity: 0.35; }
+
+  .team-logo {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    flex-shrink: 0;
+    border-radius: 5px;
+  }
+
+  .name-cell-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .pos-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-left: 8px;
+    vertical-align: middle;
+    opacity: 0.85;
+  }
+
+  .pos-QB  { background: rgba(248,113,113,0.18); color: var(--qb);  }
+  .pos-RB  { background: rgba(96,165,250,0.18);  color: var(--rb);  }
+  .pos-WR  { background: rgba(52,211,153,0.18);  color: var(--wr);  }
+  .pos-TE  { background: rgba(167,139,250,0.18); color: var(--te);  }
+  .pos-K   { background: rgba(251,191,36,0.18);  color: var(--k);   }
+  .pos-DST { background: rgba(251,146,60,0.18);  color: var(--dst); }
+
+  .td-team {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .td-bye {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .td-sos { text-align: center; }
+
+  .stars {
+    display: inline-flex;
+    gap: 1px;
+  }
+
+  .star { font-size: 0.65rem; }
+  .star.on  { color: var(--accent); }
+  .star.off { color: var(--border); }
+
+  .td-ecr {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    text-align: right;
+    padding-right: 20px;
+  }
+
+  .ecr-pos { color: #34d399; }
+  .ecr-neg { color: var(--accent2); }
+  .ecr-zero { color: var(--muted); }
+
+  .move-btns {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  body.edit-mode .move-btns { display: flex; }
+
+  .move-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-size: 0.7rem;
+    line-height: 1;
+    padding: 3px 6px;
+    cursor: pointer;
+    transition: all 0.1s;
+    touch-action: manipulation;
+    user-select: none;
+  }
+
+  .move-btn:hover, .move-btn:active { background: var(--accent); border-color: var(--accent); color: #0d0f14; }
+  .move-btn:disabled { opacity: 0.2; pointer-events: none; }
+
+  .starter-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-left: 5px;
+    vertical-align: middle;
+    border: 1px solid currentColor;
+  }
+
+  .starter-tag.role-1 { opacity: 1; }
+  .starter-tag.role-2 { opacity: 0.55; }
+  .starter-tag.role-3 { opacity: 0.3; }
+
+  .starter-QB  { color: var(--qb);  background: rgba(248,113,113,0.1); }
+  .starter-RB  { color: var(--rb);  background: rgba(96,165,250,0.1); }
+  .starter-WR  { color: var(--wr);  background: rgba(52,211,153,0.1); }
+  .starter-TE  { color: var(--te);  background: rgba(167,139,250,0.1); }
+  .starter-K   { color: var(--k);   background: rgba(251,191,36,0.1); }
+  .starter-DST { color: var(--dst); background: rgba(251,146,60,0.1); }
+
+  .no-results {
+    text-align: center;
+    padding: 60px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+  }
+
+  .edit-btn {
+    padding: 6px 18px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .edit-btn.active { background: var(--accent); border-color: var(--accent); color: #0d0f14; }
+
+  .edit-banner {
+    display: none;
+    padding: 8px 32px;
+    font-size: 0.72rem;
+    color: #0d0f14;
+    background: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  body.edit-mode .edit-banner { display: block; }
+
+  @media (max-width: 640px) {
+    header, .controls, .hint, .table-wrap { padding-left: 16px; padding-right: 16px; }
+    .search-wrap input { width: 150px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Fantasy<span>Draft</span></div>
+  <div class="stats-bar" id="statsBar">
+    <div><strong id="countAll">296</strong>Total</div>
+    <div><strong id="countFiltered">296</strong>Showing</div>
+    <div><strong id="countCustom">0</strong>Reordered</div>
+  </div>
+</header>
+
+<div class="controls">
+  <span class="filter-label">Filter</span>
+  <button class="pos-btn active" data-pos="ALL">All</button>
+  <button class="pos-btn" data-pos="QB">QB</button>
+  <button class="pos-btn" data-pos="RB">RB</button>
+  <button class="pos-btn" data-pos="WR">WR</button>
+  <button class="pos-btn" data-pos="TE">TE</button>
+  <button class="pos-btn" data-pos="K">K</button>
+  <button class="pos-btn" data-pos="DST">DST</button>
+  <div style="margin-left:auto;display:flex;gap:10px;align-items:center;">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search player…">
+    </div>
+    <button class="reset-btn" id="resetBtn">↺ Reset</button>
+    <button class="edit-btn" id="editBtn">✎ Edit Rankings</button>
+  </div>
+</div>
+
+<div class="edit-banner" id="editBanner">✎ EDIT MODE — use ▲ ▼ buttons to move players · tap "Done" when finished</div>
+
+<div class="table-wrap">
+  <table id="rankTable">
+    <thead>
+      <tr>
+        <th class="td-move"></th>
+        <th class="td-rank">RK</th>
+        <th>Player</th>
+        <th>Team</th>
+        <th class="td-bye" style="text-align:center">BYE</th>
+        <th style="text-align:center">SOS</th>
+        <th class="td-ecr" style="text-align:right">ECR vs ADP</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="no-results" id="noResults" style="display:none">No players match your filter.</div>
+</div>
+
+<script>
+const RAW = [
+  {rk:1,name:"J. Chase",team:"CIN",pos:"WR",posRk:1,bye:6,sos:4,ecr:2,tier:1},
+  {rk:2,name:"B. Robinson",team:"ATL",pos:"RB",posRk:1,bye:11,sos:2,ecr:0,tier:1},
+  {rk:3,name:"P. Nacua",team:"LAR",pos:"WR",posRk:2,bye:11,sos:1,ecr:1,tier:1},
+  {rk:4,name:"J. Smith-Njigba",team:"SEA",pos:"WR",posRk:3,bye:11,sos:3,ecr:1,tier:1},
+  {rk:5,name:"J. Gibbs",team:"DET",pos:"RB",posRk:2,bye:6,sos:5,ecr:-4,tier:2},
+  {rk:6,name:"A. St. Brown",team:"DET",pos:"WR",posRk:4,bye:6,sos:4,ecr:2,tier:2},
+  {rk:7,name:"C. McCaffrey",team:"SF",pos:"RB",posRk:3,bye:8,sos:2,ecr:-1,tier:2},
+  {rk:8,name:"C. Lamb",team:"DAL",pos:"WR",posRk:5,bye:14,sos:2,ecr:2,tier:2},
+  {rk:9,name:"J. Jefferson",team:"MIN",pos:"WR",posRk:6,bye:6,sos:5,ecr:3,tier:2},
+  {rk:10,name:"J. Taylor",team:"IND",pos:"RB",posRk:4,bye:13,sos:4,ecr:-3,tier:2},
+  {rk:11,name:"D. London",team:"ATL",pos:"WR",posRk:7,bye:11,sos:3,ecr:7,tier:3},
+  {rk:12,name:"N. Collins",team:"HOU",pos:"WR",posRk:8,bye:8,sos:3,ecr:12,tier:3},
+  {rk:13,name:"D. Achane",team:"MIA",pos:"RB",posRk:5,bye:6,sos:3,ecr:0,tier:3},
+  {rk:14,name:"M. Nabers",team:"NYG",pos:"WR",posRk:9,bye:8,sos:4,ecr:11,tier:3},
+  {rk:15,name:"T. McBride",team:"ARI",pos:"TE",posRk:1,bye:14,sos:2,ecr:4,tier:3},
+  {rk:16,name:"G. Pickens",team:"DAL",pos:"WR",posRk:10,bye:14,sos:2,ecr:10,tier:4},
+  {rk:17,name:"R. Rice",team:"KC",pos:"WR",posRk:11,bye:5,sos:2,ecr:6,tier:4},
+  {rk:18,name:"A. Jeanty",team:"LV",pos:"RB",posRk:6,bye:13,sos:2,ecr:-7,tier:4},
+  {rk:19,name:"C. Olave",team:"NO",pos:"WR",posRk:12,bye:8,sos:3,ecr:11,tier:4},
+  {rk:20,name:"J. Cook III",team:"BUF",pos:"RB",posRk:7,bye:7,sos:2,ecr:-11,tier:4},
+  {rk:21,name:"B. Bowers",team:"LV",pos:"TE",posRk:2,bye:13,sos:3,ecr:0,tier:4},
+  {rk:22,name:"C. Brown",team:"CIN",pos:"RB",posRk:8,bye:6,sos:2,ecr:-7,tier:4},
+  {rk:23,name:"A.J. Brown",team:"PHI",pos:"WR",posRk:13,bye:10,sos:4,ecr:5,tier:4},
+  {rk:24,name:"J. Allen",team:"BUF",pos:"QB",posRk:1,bye:7,sos:3,ecr:5,tier:4},
+  {rk:25,name:"O. Hampton",team:"LAC",pos:"RB",posRk:9,bye:7,sos:3,ecr:-8,tier:4},
+  {rk:26,name:"S. Barkley",team:"PHI",pos:"RB",posRk:10,bye:10,sos:4,ecr:-12,tier:5},
+  {rk:27,name:"T. McMillan",team:"CAR",pos:"WR",posRk:14,bye:5,sos:2,ecr:9,tier:5},
+  {rk:28,name:"L. Jackson",team:"BAL",pos:"QB",posRk:2,bye:13,sos:3,ecr:21,tier:5},
+  {rk:29,name:"G. Wilson",team:"NYJ",pos:"WR",posRk:15,bye:13,sos:4,ecr:6,tier:5},
+  {rk:30,name:"D. Smith",team:"PHI",pos:"WR",posRk:16,bye:10,sos:4,ecr:4,tier:5},
+  {rk:31,name:"K. Walker III",team:"KC",pos:"RB",posRk:11,bye:5,sos:3,ecr:-15,tier:5},
+  {rk:32,name:"T. Higgins",team:"CIN",pos:"WR",posRk:17,bye:6,sos:4,ecr:6,tier:5},
+  {rk:33,name:"D. Maye",team:"NE",pos:"QB",posRk:3,bye:11,sos:2,ecr:27,tier:5},
+  {rk:34,name:"J. Love",team:"ARI",pos:"RB",posRk:12,bye:14,sos:2,ecr:-12,tier:5},
+  {rk:35,name:"C. Loveland",team:"CHI",pos:"TE",posRk:3,bye:10,sos:2,ecr:9,tier:5},
+  {rk:36,name:"L. McConkey",team:"LAC",pos:"WR",posRk:18,bye:7,sos:2,ecr:4,tier:5},
+  {rk:37,name:"J. Jacobs",team:"GB",pos:"RB",posRk:13,bye:11,sos:4,ecr:-10,tier:5},
+  {rk:38,name:"Z. Flowers",team:"BAL",pos:"WR",posRk:19,bye:13,sos:4,ecr:1,tier:5},
+  {rk:39,name:"L. Burden III",team:"CHI",pos:"WR",posRk:20,bye:10,sos:3,ecr:6,tier:6},
+  {rk:40,name:"J. Waddle",team:"DEN",pos:"WR",posRk:21,bye:10,sos:2,ecr:10,tier:6},
+  {rk:41,name:"D. Henry",team:"BAL",pos:"RB",posRk:14,bye:13,sos:3,ecr:-21,tier:6},
+  {rk:42,name:"B. Hall",team:"NYJ",pos:"RB",posRk:15,bye:13,sos:3,ecr:-11,tier:6},
+  {rk:43,name:"J. Burrow",team:"CIN",pos:"QB",posRk:4,bye:6,sos:3,ecr:13,tier:6},
+  {rk:44,name:"T. McLaurin",team:"WAS",pos:"WR",posRk:22,bye:7,sos:2,ecr:7,tier:6},
+  {rk:45,name:"D. Adams",team:"LAR",pos:"WR",posRk:23,bye:11,sos:1,ecr:2,tier:6},
+  {rk:46,name:"E. Egbuka",team:"TB",pos:"WR",posRk:24,bye:10,sos:4,ecr:-5,tier:6},
+  {rk:47,name:"T. Etienne Jr.",team:"NO",pos:"RB",posRk:16,bye:8,sos:3,ecr:-14,tier:6},
+  {rk:48,name:"K. Williams",team:"LAR",pos:"RB",posRk:17,bye:11,sos:5,ecr:-16,tier:6},
+  {rk:49,name:"J. Williams",team:"DAL",pos:"RB",posRk:18,bye:14,sos:4,ecr:-12,tier:6},
+  {rk:50,name:"M. Evans",team:"SF",pos:"WR",posRk:25,bye:8,sos:2,ecr:8,tier:6},
+  {rk:51,name:"J. Williams",team:"DET",pos:"WR",posRk:26,bye:6,sos:4,ecr:1,tier:6},
+  {rk:52,name:"J. Daniels",team:"WAS",pos:"QB",posRk:5,bye:7,sos:2,ecr:13,tier:6},
+  {rk:53,name:"B. Irving",team:"TB",pos:"RB",posRk:19,bye:10,sos:2,ecr:-10,tier:6},
+  {rk:54,name:"T. Warren",team:"IND",pos:"TE",posRk:4,bye:13,sos:3,ecr:12,tier:6},
+  {rk:55,name:"J. Hurts",team:"PHI",pos:"QB",posRk:6,bye:10,sos:5,ecr:14,tier:6},
+  {rk:56,name:"DJ Moore",team:"BUF",pos:"WR",posRk:27,bye:7,sos:4,ecr:-3,tier:6},
+  {rk:57,name:"C. Skattebo",team:"NYG",pos:"RB",posRk:20,bye:8,sos:4,ecr:-15,tier:6},
+  {rk:58,name:"C. Watson",team:"GB",pos:"WR",posRk:28,bye:11,sos:5,ecr:-1,tier:7},
+  {rk:59,name:"T. Henderson",team:"NE",pos:"RB",posRk:21,bye:11,sos:2,ecr:-13,tier:7},
+  {rk:60,name:"R. Odunze",team:"CHI",pos:"WR",posRk:29,bye:10,sos:3,ecr:-1,tier:7},
+  {rk:61,name:"D. Montgomery",team:"HOU",pos:"RB",posRk:22,bye:8,sos:4,ecr:-13,tier:7},
+  {rk:62,name:"Q. Judkins",team:"CLE",pos:"RB",posRk:23,bye:11,sos:3,ecr:-7,tier:7},
+  {rk:63,name:"D. Swift",team:"CHI",pos:"RB",posRk:24,bye:10,sos:2,ecr:-9,tier:7},
+  {rk:64,name:"C. Tate",team:"TEN",pos:"WR",posRk:30,bye:9,sos:3,ecr:0,tier:7},
+  {rk:65,name:"M. Harrison Jr.",team:"ARI",pos:"WR",posRk:31,bye:14,sos:2,ecr:2,tier:7},
+  {rk:66,name:"J. Herbert",team:"LAC",pos:"QB",posRk:7,bye:7,sos:2,ecr:13,tier:7},
+  {rk:67,name:"J. Dart",team:"NYG",pos:"QB",posRk:8,bye:8,sos:4,ecr:17,tier:7},
+  {rk:68,name:"T. Kraft",team:"GB",pos:"TE",posRk:5,bye:11,sos:2,ecr:18,tier:7},
+  {rk:69,name:"C. Sutton",team:"DEN",pos:"WR",posRk:32,bye:10,sos:2,ecr:9,tier:7},
+  {rk:70,name:"H. Fannin Jr.",team:"CLE",pos:"TE",posRk:6,bye:11,sos:3,ecr:13,tier:7},
+  {rk:71,name:"J. Warren",team:"PIT",pos:"RB",posRk:25,bye:9,sos:2,ecr:1,tier:7},
+  {rk:72,name:"C. Godwin Jr.",team:"TB",pos:"WR",posRk:33,bye:10,sos:4,ecr:16,tier:7},
+  {rk:73,name:"M. Wilson",team:"ARI",pos:"WR",posRk:34,bye:14,sos:2,ecr:14,tier:7},
+  {rk:74,name:"RJ Harvey",team:"DEN",pos:"RB",posRk:26,bye:10,sos:2,ecr:2,tier:7},
+  {rk:75,name:"C. Williams",team:"CHI",pos:"QB",posRk:9,bye:10,sos:3,ecr:-7,tier:7},
+  {rk:76,name:"B. Tuten",team:"JAC",pos:"RB",posRk:27,bye:7,sos:4,ecr:-15,tier:7},
+  {rk:77,name:"DK Metcalf",team:"PIT",pos:"WR",posRk:35,bye:9,sos:3,ecr:-4,tier:7},
+  {rk:78,name:"C. Hubbard",team:"CAR",pos:"RB",posRk:28,bye:5,sos:1,ecr:-15,tier:8},
+  {rk:79,name:"J. Price",team:"SEA",pos:"RB",posRk:29,bye:11,sos:4,ecr:-17,tier:8},
+  {rk:80,name:"A. Pierce",team:"IND",pos:"WR",posRk:36,bye:13,sos:4,ecr:-5,tier:8},
+  {rk:81,name:"T. Lawrence",team:"JAC",pos:"QB",posRk:10,bye:7,sos:4,ecr:-1,tier:8},
+  {rk:82,name:"K. Pitts Sr.",team:"ATL",pos:"TE",posRk:7,bye:11,sos:3,ecr:15,tier:8},
+  {rk:83,name:"J. Meyers",team:"JAC",pos:"WR",posRk:37,bye:7,sos:4,ecr:9,tier:8},
+  {rk:84,name:"J. Tyson",team:"NO",pos:"WR",posRk:38,bye:8,sos:3,ecr:-14,tier:8},
+  {rk:85,name:"S. LaPorta",team:"DET",pos:"TE",posRk:8,bye:6,sos:3,ecr:9,tier:8},
+  {rk:86,name:"R. Dowdle",team:"PIT",pos:"RB",posRk:30,bye:9,sos:2,ecr:3,tier:8},
+  {rk:87,name:"D. Prescott",team:"DAL",pos:"QB",posRk:11,bye:14,sos:2,ecr:-6,tier:8},
+  {rk:88,name:"R. Stevenson",team:"NE",pos:"RB",posRk:31,bye:11,sos:2,ecr:-11,tier:8},
+  {rk:89,name:"M. Pittman Jr.",team:"PIT",pos:"WR",posRk:39,bye:9,sos:3,ecr:12,tier:8},
+  {rk:90,name:"B. Thomas Jr.",team:"JAC",pos:"WR",posRk:40,bye:7,sos:4,ecr:-19,tier:8},
+  {rk:91,name:"M. Lemon",team:"PHI",pos:"WR",posRk:41,bye:10,sos:4,ecr:-6,tier:8},
+  {rk:92,name:"T. Pollard",team:"TEN",pos:"RB",posRk:32,bye:9,sos:3,ecr:-10,tier:8},
+  {rk:93,name:"W. Robinson",team:"TEN",pos:"WR",posRk:42,bye:9,sos:3,ecr:18,tier:8},
+  {rk:94,name:"K. Monangai",team:"CHI",pos:"RB",posRk:33,bye:10,sos:2,ecr:-4,tier:8},
+  {rk:95,name:"B. Purdy",team:"SF",pos:"QB",posRk:12,bye:8,sos:1,ecr:1,tier:8},
+  {rk:96,name:"R. Pearsall",team:"SF",pos:"WR",posRk:43,bye:8,sos:2,ecr:-1,tier:8},
+  {rk:97,name:"P. Washington",team:"JAC",pos:"WR",posRk:44,bye:7,sos:4,ecr:-23,tier:8},
+  {rk:98,name:"P. Mahomes II",team:"KC",pos:"QB",posRk:13,bye:5,sos:2,ecr:-7,tier:9},
+  {rk:99,name:"J. Addison",team:"MIN",pos:"WR",posRk:45,bye:6,sos:5,ecr:1,tier:9},
+  {rk:100,name:"M. Stafford",team:"LAR",pos:"QB",posRk:14,bye:11,sos:3,ecr:-7,tier:9},
+  {rk:101,name:"Bo Nix",team:"DEN",pos:"QB",posRk:15,bye:10,sos:3,ecr:1,tier:9},
+  {rk:102,name:"A. Jones Sr.",team:"MIN",pos:"RB",posRk:34,bye:6,sos:4,ecr:22,tier:9},
+  {rk:103,name:"J. Downs",team:"IND",pos:"WR",posRk:46,bye:13,sos:4,ecr:3,tier:9},
+  {rk:104,name:"J. Ferguson",team:"DAL",pos:"TE",posRk:9,bye:14,sos:2,ecr:16,tier:9},
+  {rk:105,name:"D. Kincaid",team:"BUF",pos:"TE",posRk:10,bye:7,sos:3,ecr:26,tier:9},
+  {rk:106,name:"K. Gainwell",team:"TB",pos:"RB",posRk:35,bye:10,sos:2,ecr:-2,tier:9},
+  {rk:107,name:"J. Reed",team:"GB",pos:"WR",posRk:47,bye:11,sos:5,ecr:-8,tier:9},
+  {rk:108,name:"J.K. Dobbins",team:"DEN",pos:"RB",posRk:36,bye:10,sos:2,ecr:-1,tier:9},
+  {rk:109,name:"B. Corum",team:"LAR",pos:"RB",posRk:37,bye:11,sos:5,ecr:-4,tier:9},
+  {rk:110,name:"T. Kelce",team:"KC",pos:"TE",posRk:11,bye:5,sos:4,ecr:8,tier:9},
+  {rk:111,name:"J. Goff",team:"DET",pos:"QB",posRk:16,bye:6,sos:5,ecr:-8,tier:9},
+  {rk:112,name:"K. Murray",team:"MIN",pos:"QB",posRk:17,bye:6,sos:5,ecr:-2,tier:9},
+  {rk:113,name:"K. Shakir",team:"BUF",pos:"WR",posRk:48,bye:7,sos:4,ecr:4,tier:9},
+  {rk:114,name:"J. Love",team:"GB",pos:"QB",posRk:18,bye:11,sos:4,ecr:-5,tier:9},
+  {rk:115,name:"Q. Johnston",team:"LAC",pos:"WR",posRk:49,bye:7,sos:2,ecr:-17,tier:9},
+  {rk:116,name:"R. White",team:"WAS",pos:"RB",posRk:38,bye:7,sos:4,ecr:5,tier:9},
+  {rk:117,name:"I. Likely",team:"NYG",pos:"TE",posRk:12,bye:8,sos:3,ecr:12,tier:9},
+  {rk:118,name:"G. Kittle",team:"SF",pos:"TE",posRk:13,bye:8,sos:3,ecr:-4,tier:9},
+  {rk:119,name:"M. Willis",team:"MIA",pos:"QB",posRk:19,bye:6,sos:3,ecr:9,tier:9},
+  {rk:120,name:"J. Croskey-Merritt",team:"WAS",pos:"RB",posRk:39,bye:7,sos:4,ecr:2,tier:9},
+  {rk:121,name:"T. Shough",team:"NO",pos:"QB",posRk:20,bye:8,sos:3,ecr:-13,tier:9},
+  {rk:122,name:"B. Mayfield",team:"TB",pos:"QB",posRk:21,bye:10,sos:2,ecr:-10,tier:9},
+  {rk:123,name:"O. Gadsden II",team:"LAC",pos:"TE",posRk:14,bye:7,sos:4,ecr:9,tier:9},
+  {rk:124,name:"J. Higgins",team:"HOU",pos:"WR",posRk:50,bye:8,sos:3,ecr:-1,tier:9},
+  {rk:125,name:"X. Worthy",team:"KC",pos:"WR",posRk:51,bye:5,sos:2,ecr:-9,tier:9},
+  {rk:126,name:"R. Doubs",team:"NE",pos:"WR",posRk:52,bye:11,sos:2,ecr:-13,tier:10},
+  {rk:127,name:"D. Goedert",team:"PHI",pos:"TE",posRk:15,bye:10,sos:4,ecr:3,tier:10},
+  {rk:128,name:"T. Allgeier",team:"ARI",pos:"RB",posRk:40,bye:14,sos:2,ecr:13,tier:10},
+  {rk:129,name:"Z. Charbonnet",team:"SEA",pos:"RB",posRk:41,bye:11,sos:4,ecr:35,tier:10},
+  {rk:130,name:"J. Coker",team:"CAR",pos:"WR",posRk:53,bye:5,sos:2,ecr:-3,tier:10},
+  {rk:131,name:"W. Marks",team:"HOU",pos:"RB",posRk:42,bye:8,sos:4,ecr:13,tier:10},
+  {rk:132,name:"J. Mason",team:"MIN",pos:"RB",posRk:43,bye:6,sos:4,ecr:-7,tier:10},
+  {rk:133,name:"T. Tracy Jr.",team:"NYG",pos:"RB",posRk:44,bye:8,sos:4,ecr:2,tier:10},
+  {rk:134,name:"C.J. Stroud",team:"HOU",pos:"QB",posRk:22,bye:8,sos:4,ecr:2,tier:10},
+  {rk:135,name:"J. Johnson",team:"NO",pos:"TE",posRk:16,bye:8,sos:2,ecr:10,tier:10},
+  {rk:136,name:"KC Concepcion",team:"CLE",pos:"WR",posRk:54,bye:11,sos:3,ecr:-17,tier:10},
+  {rk:137,name:"M. Golden",team:"GB",pos:"WR",posRk:55,bye:11,sos:5,ecr:-22,tier:10},
+  {rk:138,name:"S. Darnold",team:"SEA",pos:"QB",posRk:23,bye:11,sos:4,ecr:-4,tier:10},
+  {rk:139,name:"T. Spears",team:"TEN",pos:"RB",posRk:45,bye:9,sos:3,ecr:16,tier:10},
+  {rk:140,name:"B. Strange",team:"JAC",pos:"TE",posRk:17,bye:7,sos:3,ecr:10,tier:10},
+  {rk:141,name:"D. Sampson",team:"CLE",pos:"RB",posRk:46,bye:11,sos:3,ecr:13,tier:10},
+  {rk:142,name:"A. Kamara",team:"NO",pos:"RB",posRk:47,bye:8,sos:3,ecr:26,tier:10},
+  {rk:143,name:"M. Andrews",team:"BAL",pos:"TE",posRk:18,bye:13,sos:4,ecr:-6,tier:10},
+  {rk:144,name:"B. Young",team:"CAR",pos:"QB",posRk:24,bye:5,sos:2,ecr:-1,tier:10},
+  {rk:145,name:"C. Rodriguez Jr.",team:"JAC",pos:"RB",posRk:48,bye:7,sos:4,ecr:-19,tier:10},
+  {rk:146,name:"I. Pacheco",team:"DET",pos:"RB",posRk:49,bye:6,sos:5,ecr:3,tier:10},
+  {rk:147,name:"R. Shaheed",team:"SEA",pos:"WR",posRk:56,bye:11,sos:3,ecr:1,tier:10},
+  {rk:148,name:"C. Ward",team:"TEN",pos:"QB",posRk:25,bye:9,sos:3,ecr:-10,tier:10},
+  {rk:149,name:"J. Conner",team:"ARI",pos:"RB",posRk:50,bye:14,sos:2,ecr:38,tier:10},
+  {rk:150,name:"J. Brooks",team:"CAR",pos:"RB",posRk:51,bye:5,sos:1,ecr:-17,tier:10},
+  {rk:151,name:"H. Henry",team:"NE",pos:"TE",posRk:19,bye:11,sos:4,ecr:2,tier:10},
+  {rk:152,name:"J. Jeudy",team:"CLE",pos:"WR",posRk:57,bye:11,sos:3,ecr:24,tier:10},
+  {rk:153,name:"T. Hunter",team:"JAC",pos:"WR",posRk:58,bye:7,sos:4,ecr:53,tier:10},
+  {rk:154,name:"D. Samuel Sr.",team:"FA",pos:"WR",posRk:59,bye:null,sos:null,ecr:6,tier:10},
+  {rk:155,name:"B. Allen",team:"NYJ",pos:"RB",posRk:52,bye:13,sos:3,ecr:37,tier:10},
+  {rk:156,name:"J. Coleman",team:"DEN",pos:"RB",posRk:53,bye:10,sos:2,ecr:0,tier:10},
+  {rk:157,name:"J. Jennings",team:"MIN",pos:"WR",posRk:60,bye:6,sos:5,ecr:-17,tier:10},
+  {rk:158,name:"D. Boston",team:"CLE",pos:"WR",posRk:61,bye:11,sos:3,ecr:5,tier:10},
+  {rk:159,name:"K. Mitchell",team:"LAC",pos:"RB",posRk:54,bye:7,sos:3,ecr:-7,tier:10},
+  {rk:160,name:"D. Jones",team:"IND",pos:"QB",posRk:26,bye:13,sos:4,ecr:-21,tier:10},
+  {rk:161,name:"S. Diggs",team:"FA",pos:"WR",posRk:62,bye:null,sos:null,ecr:-19,tier:11},
+  {rk:162,name:"O. Cooper Jr.",team:"NYJ",pos:"WR",posRk:63,bye:13,sos:4,ecr:-4,tier:11},
+  {rk:163,name:"A. Mitchell",team:"NYJ",pos:"WR",posRk:64,bye:13,sos:4,ecr:45,tier:11},
+  {rk:164,name:"HOU DST",team:"HOU",pos:"DST",posRk:1,bye:8,sos:2,ecr:36,tier:11},
+  {rk:165,name:"D. Schultz",team:"HOU",pos:"TE",posRk:20,bye:8,sos:4,ecr:5,tier:11},
+  {rk:166,name:"B. Aiyuk",team:"SF",pos:"WR",posRk:65,bye:8,sos:2,ecr:3,tier:11},
+  {rk:167,name:"B. Robinson Jr.",team:"ATL",pos:"RB",posRk:55,bye:11,sos:2,ecr:5,tier:11},
+  {rk:168,name:"K. Boutte",team:"NE",pos:"WR",posRk:66,bye:11,sos:2,ecr:27,tier:11},
+  {rk:169,name:"J. McMillan",team:"TB",pos:"WR",posRk:67,bye:10,sos:4,ecr:-23,tier:11},
+  {rk:170,name:"E. Wilson",team:"SEA",pos:"RB",posRk:56,bye:11,sos:4,ecr:1,tier:11},
+  {rk:171,name:"C. Okonkwo",team:"WAS",pos:"TE",posRk:21,bye:7,sos:1,ecr:-20,tier:11},
+  {rk:172,name:"T. Bigsby",team:"PHI",pos:"RB",posRk:57,bye:10,sos:4,ecr:9,tier:11},
+  {rk:173,name:"T. Harris",team:"LAC",pos:"WR",posRk:68,bye:7,sos:2,ecr:4,tier:11},
+  {rk:174,name:"T. Franklin",team:"DEN",pos:"WR",posRk:69,bye:10,sos:2,ecr:24,tier:11},
+  {rk:175,name:"M. Washington Jr.",team:"LV",pos:"RB",posRk:58,bye:13,sos:2,ecr:7,tier:11},
+  {rk:176,name:"T.J. Hockenson",team:"MIN",pos:"TE",posRk:22,bye:6,sos:4,ecr:-14,tier:11},
+  {rk:177,name:"J. Brissett",team:"ARI",pos:"QB",posRk:27,bye:14,sos:2,ecr:-16,tier:11},
+  {rk:178,name:"A. Williams",team:"WAS",pos:"WR",posRk:70,bye:7,sos:2,ecr:0,tier:11},
+  {rk:179,name:"DEN DST",team:"DEN",pos:"DST",posRk:2,bye:10,sos:4,ecr:31,tier:11},
+  {rk:180,name:"E. Johnson",team:"KC",pos:"RB",posRk:59,bye:5,sos:3,ecr:-14,tier:11},
+  {rk:181,name:"SEA DST",team:"SEA",pos:"DST",posRk:3,bye:11,sos:2,ecr:21,tier:11},
+  {rk:182,name:"K. Vidal",team:"LAC",pos:"RB",posRk:60,bye:7,sos:3,ecr:3,tier:11},
+  {rk:183,name:"T. Tucker",team:"LV",pos:"WR",posRk:71,bye:13,sos:2,ecr:-26,tier:11},
+  {rk:184,name:"LAR DST",team:"LAR",pos:"DST",posRk:4,bye:11,sos:2,ecr:29,tier:11},
+  {rk:185,name:"PHI DST",team:"PHI",pos:"DST",posRk:5,bye:10,sos:0,ecr:41,tier:11},
+  {rk:186,name:"J. Noel",team:"HOU",pos:"WR",posRk:72,bye:8,sos:3,ecr:81,tier:11},
+  {rk:187,name:"T. Hill",team:"FA",pos:"WR",posRk:73,bye:null,sos:null,ecr:3,tier:11},
+  {rk:188,name:"N. Singleton",team:"TEN",pos:"RB",posRk:61,bye:9,sos:3,ecr:-4,tier:11},
+  {rk:189,name:"K. Sadiq",team:"NYJ",pos:"TE",posRk:23,bye:13,sos:4,ecr:-42,tier:11},
+  {rk:190,name:"P. Bryant",team:"DEN",pos:"WR",posRk:74,bye:10,sos:2,ecr:64,tier:12},
+  {rk:191,name:"R. Davis",team:"BUF",pos:"RB",posRk:62,bye:7,sos:2,ecr:2,tier:12},
+  {rk:192,name:"NE DST",team:"NE",pos:"DST",posRk:6,bye:11,sos:3,ecr:32,tier:12},
+  {rk:193,name:"C. Ridley",team:"TEN",pos:"WR",posRk:75,bye:9,sos:3,ecr:1,tier:12},
+  {rk:194,name:"K. Allen",team:"WAS",pos:"RB",posRk:63,bye:7,sos:4,ecr:-14,tier:12},
+  {rk:195,name:"MIN DST",team:"MIN",pos:"DST",posRk:7,bye:6,sos:1,ecr:27,tier:12},
+  {rk:196,name:"B. Aubrey",team:"DAL",pos:"K",posRk:1,bye:14,sos:2,ecr:null,tier:12},
+  {rk:197,name:"JAC DST",team:"JAC",pos:"DST",posRk:8,bye:7,sos:3,ecr:31,tier:12},
+  {rk:198,name:"AJ Barner",team:"SEA",pos:"TE",posRk:24,bye:11,sos:3,ecr:-25,tier:12},
+  {rk:199,name:"R. Flournoy",team:"DAL",pos:"WR",posRk:76,bye:14,sos:2,ecr:-20,tier:12},
+  {rk:200,name:"C. Dike",team:"TEN",pos:"WR",posRk:77,bye:9,sos:3,ecr:48,tier:12},
+  {rk:201,name:"D. Mooney",team:"NYG",pos:"WR",posRk:78,bye:8,sos:4,ecr:2,tier:12},
+  {rk:202,name:"PIT DST",team:"PIT",pos:"DST",posRk:9,bye:9,sos:5,ecr:27,tier:12},
+  {rk:203,name:"I. TeSlaa",team:"DET",pos:"WR",posRk:79,bye:6,sos:4,ecr:-28,tier:12},
+  {rk:204,name:"K. Fairbairn",team:"HOU",pos:"K",posRk:2,bye:8,sos:2,ecr:null,tier:12},
+  {rk:205,name:"S. Tucker",team:"TB",pos:"RB",posRk:64,bye:10,sos:2,ecr:-8,tier:12},
+  {rk:206,name:"C. Dicker",team:"LAC",pos:"K",posRk:3,bye:7,sos:2,ecr:null,tier:12},
+  {rk:207,name:"C. Little",team:"JAC",pos:"K",posRk:4,bye:7,sos:4,ecr:null,tier:12},
+  {rk:208,name:"LAC DST",team:"LAC",pos:"DST",posRk:10,bye:7,sos:3,ecr:23,tier:12},
+  {rk:209,name:"CLE DST",team:"CLE",pos:"DST",posRk:11,bye:11,sos:5,ecr:10,tier:12},
+  {rk:210,name:"J. Wright",team:"MIA",pos:"RB",posRk:65,bye:6,sos:3,ecr:24,tier:12},
+  {rk:211,name:"C. Bell",team:"MIA",pos:"WR",posRk:80,bye:6,sos:3,ecr:5,tier:12},
+  {rk:212,name:"J. Myers",team:"SEA",pos:"K",posRk:5,bye:11,sos:4,ecr:null,tier:12},
+  {rk:213,name:"D. Wicks",team:"PHI",pos:"WR",posRk:81,bye:10,sos:4,ecr:17,tier:12},
+  {rk:214,name:"GB DST",team:"GB",pos:"DST",posRk:12,bye:11,sos:2,ecr:23,tier:12},
+  {rk:215,name:"F. Mendoza",team:"LV",pos:"QB",posRk:28,bye:13,sos:1,ecr:-50,tier:12},
+  {rk:216,name:"G. Helm",team:"TEN",pos:"TE",posRk:25,bye:9,sos:3,ecr:-33,tier:12},
+  {rk:217,name:"E. Ayomanor",team:"TEN",pos:"WR",posRk:82,bye:9,sos:3,ecr:118,tier:12},
+  {rk:218,name:"E. Pineiro",team:"SF",pos:"K",posRk:6,bye:8,sos:5,ecr:null,tier:12},
+  {rk:219,name:"G. Bernard",team:"PIT",pos:"WR",posRk:83,bye:9,sos:3,ecr:-8,tier:12},
+  {rk:220,name:"E. McPherson",team:"CIN",pos:"K",posRk:7,bye:6,sos:2,ecr:null,tier:12},
+  {rk:221,name:"KC DST",team:"KC",pos:"DST",posRk:13,bye:5,sos:3,ecr:26,tier:12},
+  {rk:222,name:"T. Loop",team:"BAL",pos:"K",posRk:8,bye:13,sos:3,ecr:null,tier:12},
+  {rk:223,name:"C. Santos",team:"CHI",pos:"K",posRk:9,bye:10,sos:0,ecr:null,tier:12},
+  {rk:224,name:"T. Ferguson",team:"LAR",pos:"TE",posRk:26,bye:11,sos:4,ecr:-9,tier:12},
+  {rk:225,name:"D. Njoku",team:"LAC",pos:"TE",posRk:27,bye:7,sos:4,ecr:-34,tier:12},
+  {rk:226,name:"A. Borregales",team:"NE",pos:"K",posRk:10,bye:11,sos:1,ecr:null,tier:12},
+  {rk:227,name:"BAL DST",team:"BAL",pos:"DST",posRk:14,bye:13,sos:5,ecr:6,tier:12},
+  {rk:228,name:"C. McLaughlin",team:"TB",pos:"K",posRk:11,bye:10,sos:3,ecr:null,tier:12},
+  {rk:229,name:"D. Claiborne",team:"MIN",pos:"RB",posRk:66,bye:6,sos:4,ecr:-6,tier:13},
+  {rk:230,name:"DET DST",team:"DET",pos:"DST",posRk:15,bye:6,sos:5,ecr:13,tier:13},
+  {rk:231,name:"O. Gordon II",team:"MIA",pos:"RB",posRk:67,bye:6,sos:3,ecr:33,tier:13},
+  {rk:232,name:"T. Benson",team:"ARI",pos:"RB",posRk:68,bye:14,sos:2,ecr:77,tier:13},
+  {rk:233,name:"Z. Branch",team:"ATL",pos:"WR",posRk:84,bye:11,sos:3,ecr:-16,tier:13},
+  {rk:234,name:"D. Neal",team:"NO",pos:"RB",posRk:69,bye:8,sos:3,ecr:150,tier:13},
+  {rk:235,name:"D. Stribling",team:"SF",pos:"WR",posRk:85,bye:8,sos:2,ecr:-34,tier:13},
+  {rk:236,name:"J. Nailor",team:"LV",pos:"WR",posRk:86,bye:13,sos:2,ecr:-77,tier:13},
+  {rk:237,name:"G. Smith",team:"NYJ",pos:"QB",posRk:29,bye:13,sos:4,ecr:-70,tier:13},
+  {rk:238,name:"T. Dell",team:"HOU",pos:"WR",posRk:87,bye:8,sos:3,ecr:-34,tier:13},
+  {rk:239,name:"M. Washington",team:"MIA",pos:"WR",posRk:88,bye:6,sos:3,ecr:-53,tier:13},
+  {rk:240,name:"M. Taylor",team:"NYJ",pos:"TE",posRk:28,bye:13,sos:4,ecr:71,tier:13},
+  {rk:241,name:"C. Otton",team:"TB",pos:"TE",posRk:29,bye:10,sos:2,ecr:-53,tier:13},
+  {rk:242,name:"J. Bates",team:"DET",pos:"K",posRk:12,bye:6,sos:5,ecr:null,tier:13},
+  {rk:243,name:"M. Fields",team:"NYG",pos:"WR",posRk:89,bye:8,sos:4,ecr:-29,tier:13},
+  {rk:244,name:"H. Butker",team:"KC",pos:"K",posRk:13,bye:5,sos:5,ecr:null,tier:13},
+  {rk:245,name:"BUF DST",team:"BUF",pos:"DST",posRk:16,bye:7,sos:3,ecr:-3,tier:13},
+  {rk:246,name:"C. Brazzell II",team:"CAR",pos:"WR",posRk:90,bye:5,sos:2,ecr:48,tier:13},
+  {rk:247,name:"K. Johnson",team:"PIT",pos:"RB",posRk:70,bye:9,sos:2,ecr:138,tier:13},
+  {rk:248,name:"R. Bateman",team:"BAL",pos:"WR",posRk:91,bye:13,sos:4,ecr:26,tier:13},
+  {rk:249,name:"M. Penix Jr.",team:"ATL",pos:"QB",posRk:30,bye:11,sos:4,ecr:-31,tier:13},
+  {rk:250,name:"E. Sarratt",team:"BAL",pos:"WR",posRk:92,bye:13,sos:4,ecr:31,tier:13},
+  {rk:251,name:"P. Freiermuth",team:"PIT",pos:"TE",posRk:30,bye:9,sos:2,ecr:-62,tier:13},
+  {rk:252,name:"J. Lane",team:"BAL",pos:"WR",posRk:93,bye:13,sos:4,ecr:53,tier:13},
+  {rk:253,name:"C. Parkinson",team:"LAR",pos:"TE",posRk:31,bye:11,sos:4,ecr:-54,tier:13},
+  {rk:254,name:"E. Stowers",team:"PHI",pos:"TE",posRk:32,bye:10,sos:4,ecr:-45,tier:13},
+  {rk:255,name:"S. Bell",team:"BUF",pos:"WR",posRk:94,bye:7,sos:4,ecr:43,tier:13},
+  {rk:256,name:"C. Boswell",team:"PIT",pos:"K",posRk:14,bye:9,sos:4,ecr:null,tier:13},
+  {rk:257,name:"M. Mims Jr.",team:"DEN",pos:"WR",posRk:95,bye:10,sos:2,ecr:64,tier:13},
+  {rk:258,name:"C. Kupp",team:"SEA",pos:"WR",posRk:96,bye:11,sos:3,ecr:-51,tier:13},
+  {rk:259,name:"K. Williams",team:"NE",pos:"WR",posRk:97,bye:11,sos:2,ecr:127,tier:13},
+  {rk:260,name:"E. Engram",team:"DEN",pos:"TE",posRk:33,bye:10,sos:4,ecr:23,tier:13},
+  {rk:261,name:"A. Rodgers",team:"PIT",pos:"QB",posRk:31,bye:9,sos:2,ecr:-87,tier:13},
+  {rk:262,name:"T. Johnson",team:"NYG",pos:"TE",posRk:34,bye:8,sos:3,ecr:33,tier:13},
+  {rk:263,name:"K. Miller",team:"NO",pos:"RB",posRk:71,bye:8,sos:3,ecr:null,tier:13},
+  {rk:264,name:"K. Coleman",team:"BUF",pos:"WR",posRk:98,bye:7,sos:4,ecr:-5,tier:13},
+  {rk:265,name:"A. Randall",team:"BAL",pos:"RB",posRk:72,bye:13,sos:3,ecr:-5,tier:13},
+  {rk:266,name:"T. Horton",team:"SEA",pos:"WR",posRk:99,bye:11,sos:3,ecr:-16,tier:13},
+  {rk:267,name:"C. Kirk",team:"SF",pos:"WR",posRk:100,bye:8,sos:2,ecr:-55,tier:13},
+  {rk:268,name:"H. Mevis",team:"LAR",pos:"K",posRk:15,bye:11,sos:2,ecr:null,tier:13},
+  {rk:269,name:"T. Hurst III",team:"TB",pos:"WR",posRk:101,bye:10,sos:4,ecr:-29,tier:13},
+  {rk:270,name:"J. Bech",team:"LV",pos:"WR",posRk:102,bye:13,sos:2,ecr:62,tier:13},
+  {rk:271,name:"I. Davis",team:"NYJ",pos:"RB",posRk:73,bye:13,sos:3,ecr:101,tier:13},
+  {rk:272,name:"N. Harris",team:"LAC",pos:"RB",posRk:74,bye:7,sos:3,ecr:30,tier:13},
+  {rk:273,name:"S. Sanders",team:"CLE",pos:"QB",posRk:32,bye:11,sos:4,ecr:-48,tier:13},
+  {rk:274,name:"B. Smith",team:"KC",pos:"RB",posRk:75,bye:5,sos:3,ecr:101,tier:13},
+  {rk:275,name:"M. Hollins",team:"NE",pos:"WR",posRk:103,bye:11,sos:2,ecr:48,tier:13},
+  {rk:276,name:"ATL DST",team:"ATL",pos:"DST",posRk:17,bye:11,sos:4,ecr:-35,tier:13},
+  {rk:277,name:"K. Allen",team:"LAC",pos:"WR",posRk:104,bye:7,sos:2,ecr:-7,tier:13},
+  {rk:278,name:"D. Slayton",team:"NYG",pos:"WR",posRk:105,bye:8,sos:4,ecr:-10,tier:13},
+  {rk:279,name:"X. Legette",team:"CAR",pos:"WR",posRk:106,bye:5,sos:2,ecr:103,tier:13},
+  {rk:280,name:"Ty Johnson",team:"BUF",pos:"RB",posRk:76,bye:7,sos:2,ecr:-19,tier:13},
+  {rk:281,name:"D. Vele",team:"NO",pos:"WR",posRk:107,bye:8,sos:3,ecr:3,tier:14},
+  {rk:282,name:"W. Lutz",team:"DEN",pos:"K",posRk:16,bye:10,sos:1,ecr:null,tier:14},
+  {rk:283,name:"J. Blue",team:"DAL",pos:"RB",posRk:77,bye:14,sos:4,ecr:-44,tier:14},
+  {rk:284,name:"T. Tagovailoa",team:"ATL",pos:"QB",posRk:33,bye:11,sos:4,ecr:-88,tier:14},
+  {rk:285,name:"L. Allen Jr.",team:"JAC",pos:"RB",posRk:78,bye:7,sos:4,ecr:40,tier:14},
+  {rk:286,name:"J. Hill",team:"BAL",pos:"RB",posRk:79,bye:13,sos:3,ecr:-50,tier:14},
+  {rk:287,name:"J. Tonges",team:"SF",pos:"TE",posRk:35,bye:8,sos:3,ecr:-82,tier:14},
+  {rk:288,name:"J. Ford",team:"WAS",pos:"RB",posRk:80,bye:7,sos:4,ecr:75,tier:14},
+  {rk:289,name:"SF DST",team:"SF",pos:"DST",posRk:18,bye:8,sos:3,ecr:-36,tier:14},
+  {rk:290,name:"W. Reichard",team:"MIN",pos:"K",posRk:17,bye:6,sos:2,ecr:null,tier:14},
+  {rk:291,name:"C. Smyth",team:"NO",pos:"K",posRk:18,bye:8,sos:5,ecr:null,tier:14},
+  {rk:292,name:"DJ Giddens",team:"IND",pos:"RB",posRk:81,bye:13,sos:4,ecr:-35,tier:14},
+  {rk:293,name:"G. Holani",team:"SEA",pos:"RB",posRk:82,bye:11,sos:4,ecr:-6,tier:14},
+  {rk:294,name:"IND DST",team:"IND",pos:"DST",posRk:19,bye:13,sos:5,ecr:-43,tier:14},
+  {rk:295,name:"T. Thornton",team:"KC",pos:"WR",posRk:108,bye:5,sos:2,ecr:-43,tier:14},
+  {rk:296,name:"D. Singletary",team:"NYG",pos:"RB",posRk:83,bye:8,sos:null,ecr:null,tier:14},
+];
+
+const TEAM_COLORS = {
+  ARI:['#97233F','#FFB612'],ATL:['#A71930','#000000'],BAL:['#241773','#9E7C0C'],
+  BUF:['#00338D','#C60C30'],CAR:['#0085CA','#101820'],CHI:['#0B162A','#C83803'],
+  CIN:['#FB4F14','#000000'],CLE:['#311D00','#FF3C00'],DAL:['#003594','#869397'],
+  DEN:['#FB4F14','#002244'],DET:['#0076B6','#B0B7BC'],GB:['#203731','#FFB612'],
+  HOU:['#03202F','#A71930'],IND:['#002C5F','#A2AAAD'],JAC:['#006778','#9F792C'],
+  KC:['#E31837','#FFB81C'],LAC:['#0080C6','#FFC20E'],LAR:['#003594','#FFA300'],
+  LV:['#000000','#A5ACAF'],MIA:['#008E97','#FC4C02'],MIN:['#4F2683','#FFC62F'],
+  NE:['#002244','#C60C30'],NO:['#101820','#D3BC8D'],NYG:['#0B2265','#A71930'],
+  NYJ:['#125740','#FFFFFF'],PHI:['#004C54','#A5ACAF'],PIT:['#FFB612','#101820'],
+  SEA:['#002244','#69BE28'],SF:['#AA0000','#B3995D'],TB:['#D50A0A','#FF7900'],
+  TEN:['#0C2340','#4B92DB'],WAS:['#5A1414','#FFB612']
+};
+
+function teamBadge(team) {
+  const colors = TEAM_COLORS[team];
+  if (!colors) return '';
+  const [bg, fg] = colors;
+  const abbr = team.length > 3 ? team.slice(0,3) : team;
+  return `<svg class="team-logo" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+    <rect width="28" height="28" rx="5" fill="${bg}"/>
+    <text x="14" y="19" text-anchor="middle" font-family="'DM Mono',monospace" font-weight="700" font-size="${abbr.length > 2 ? '8' : '9'}" fill="${fg}">${abbr}</text>
+  </svg>`;
+}
+
+// State
+let players = RAW.map((p, i) => ({...p, customOrder: i}));
+
+// Enforce: within each team+pos group, assign customOrder slots in ascending order
+// so the highest-ranked (lowest rk) player always appears first (is labeled RB1 not RB2 etc.)
+(function fixTeamDepthOrder() {
+  // Group players by team+pos
+  const groups = {};
+  players.forEach(p => {
+    const key = `${p.team}-${p.pos}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(p);
+  });
+
+  Object.values(groups).forEach(group => {
+    if (group.length < 2) return;
+    // Get the customOrder slots this group occupies, sorted ascending
+    const slots = group.map(p => p.customOrder).sort((a, b) => a - b);
+    // Sort group members by their original rk (consensus rank) ascending
+    group.sort((a, b) => a.rk - b.rk);
+    // Assign the best slot (lowest customOrder = highest on list) to the best player
+    group.forEach((p, i) => { p.customOrder = slots[i]; });
+  });
+})();
+let activePos = 'ALL';
+let searchQ = '';
+let editMode = false;
+const crossed = new Set();
+
+function stars(n) {
+  if (n === null || n === undefined) return '<span style="color:#3a4155">—</span>';
+  let s = '';
+  for (let i = 1; i <= 5; i++) {
+    s += `<span class="star ${i <= n ? 'on' : 'off'}">★</span>`;
+  }
+  return `<span class="stars">${s}</span>`;
+}
+
+function ecrBadge(v) {
+  if (v === null || v === undefined) return '<span class="ecr-zero">—</span>';
+  if (v > 0) return `<span class="ecr-pos">+${v}</span>`;
+  if (v < 0) return `<span class="ecr-neg">${v}</span>`;
+  return `<span class="ecr-zero">0</span>`;
+}
+
+function getFiltered() {
+  return players.filter(p => {
+    const posMatch = activePos === 'ALL' || p.pos === activePos;
+    const q = searchQ.toLowerCase();
+    const searchMatch = !q || p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q);
+    return posMatch && searchMatch;
+  });
+}
+
+function render() {
+  const tbody = document.getElementById('tableBody');
+  const noResults = document.getElementById('noResults');
+  const filtered = getFiltered();
+
+  document.getElementById('countFiltered').textContent = filtered.length;
+  document.getElementById('countAll').textContent = players.length;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    noResults.style.display = 'block';
+    return;
+  }
+  noResults.style.display = 'none';
+
+  const sorted = [...filtered].sort((a, b) => a.customOrder - b.customOrder);
+
+  // Compute team position ranks: for each team+pos combo, rank by customOrder
+  const allSorted = [...players].sort((a, b) => a.customOrder - b.customOrder);
+  const teamPosCounters = {};
+  const teamPosRank = {};
+  allSorted.forEach(p => {
+    const key = `${p.team}-${p.pos}`;
+    teamPosCounters[key] = (teamPosCounters[key] || 0) + 1;
+    teamPosRank[p.rk] = teamPosCounters[key];
+  });
+
+  let html = '';
+  sorted.forEach((p, idx) => {
+    const myRank = idx + 1;
+    const origIdx = RAW.findIndex(r => r.rk === p.rk);
+    const origDisplayRank = origIdx + 1;
+    const changed = p.customOrder !== origIdx;
+    const isFirst = idx === 0;
+    const isLast = idx === sorted.length - 1;
+    const teamRank = teamPosRank[p.rk];
+    const roleLabel = `${p.pos}${teamRank}`;
+    // Style: WR1/RB1/QB1/TE1 = bright; WR2/RB2 = dimmer; WR3+ = muted
+    const roleClass = teamRank === 1 ? 'role-1' : teamRank === 2 ? 'role-2' : 'role-3';
+    html += `<tr data-rk="${p.rk}">
+      <td class="td-move">
+        <div class="move-btns">
+          <button class="move-btn" data-dir="up" data-rk="${p.rk}" ${isFirst ? 'disabled' : ''}>▲</button>
+          <button class="move-btn" data-dir="down" data-rk="${p.rk}" ${isLast ? 'disabled' : ''}>▼</button>
+        </div>
+      </td>
+      <td class="td-rank">
+        ${changed ? `<span class="my-rank">${origDisplayRank}→${myRank}</span>` : `<span style="color:var(--muted)">${origDisplayRank}</span>`}
+      </td>
+      <td class="td-name${crossed.has(p.rk) ? ' crossed' : ''}" data-rk="${p.rk}">
+        <div class="name-cell-inner">
+          ${teamBadge(p.team)}
+          <span>${p.name}</span>
+          <span class="pos-tag pos-${p.pos}">${p.pos}</span>
+          <span class="starter-tag starter-${p.pos} ${roleClass}">${roleLabel}</span>
+        </div>
+      </td>
+      <td class="td-team">${p.team}</td>
+      <td class="td-bye">${p.bye ?? '—'}</td>
+      <td class="td-sos">${stars(p.sos)}</td>
+      <td class="td-ecr">${ecrBadge(p.ecr)}</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+  updateCustomCount();
+
+  // Cross-out: double-click or double-tap on name cell
+  let lastTap = 0;
+  tbody.querySelectorAll('.td-name').forEach(cell => {
+    const rk = parseInt(cell.dataset.rk);
+    cell.addEventListener('dblclick', () => {
+      crossed.has(rk) ? crossed.delete(rk) : crossed.add(rk);
+      cell.classList.toggle('crossed');
+    });
+    cell.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - lastTap < 350) {
+        e.preventDefault();
+        crossed.has(rk) ? crossed.delete(rk) : crossed.add(rk);
+        cell.classList.toggle('crossed');
+      }
+      lastTap = now;
+    });
+  });
+
+  // Attach move button listeners
+  tbody.querySelectorAll('.move-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const rk = parseInt(btn.dataset.rk);
+      const dir = btn.dataset.dir;
+      movePlayer(rk, dir);
+    });
+  });
+}
+
+function movePlayer(rk, dir) {
+  const filtered = getFiltered().sort((a, b) => a.customOrder - b.customOrder);
+  const idx = filtered.findIndex(p => p.rk === rk);
+  const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= filtered.length) return;
+
+  // Swap customOrder values between the two players
+  const a = players.find(p => p.rk === filtered[idx].rk);
+  const b = players.find(p => p.rk === filtered[swapIdx].rk);
+  const temp = a.customOrder;
+  a.customOrder = b.customOrder;
+  b.customOrder = temp;
+
+  render();
+
+  // Scroll moved row into view on mobile
+  const row = document.querySelector(`tr[data-rk="${rk}"]`);
+  if (row) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function updateCustomCount() {
+  const changed = players.filter((p, i) => p.customOrder !== i).length;
+  document.getElementById('countCustom').textContent = changed;
+}
+
+// EDIT MODE
+document.getElementById('editBtn').addEventListener('click', () => {
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  const btn = document.getElementById('editBtn');
+  btn.classList.toggle('active', editMode);
+  btn.textContent = editMode ? '✓ Done' : '✎ Edit Rankings';
+  render();
+});
+
+// FILTER BUTTONS
+document.querySelectorAll('.pos-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activePos = btn.dataset.pos;
+    render();
+  });
+});
+
+// SEARCH
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQ = e.target.value;
+  render();
+});
+
+// RESET
+document.getElementById('resetBtn').addEventListener('click', () => {
+  players = RAW.map((p, i) => ({...p, customOrder: i}));
+  (function fixTeamDepthOrder() {
+    const groups = {};
+    players.forEach(p => {
+      const key = `${p.team}-${p.pos}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(p);
+    });
+    Object.values(groups).forEach(group => {
+      if (group.length < 2) return;
+      const slots = group.map(p => p.customOrder).sort((a, b) => a - b);
+      group.sort((a, b) => a.rk - b.rk);
+      group.forEach((p, i) => { p.customOrder = slots[i]; });
+    });
+  })();
+  crossed.clear();
+  render();
+});
+
+// INIT
+render();
+</script>
+</body>
+</html>
